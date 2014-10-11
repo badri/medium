@@ -1,0 +1,86 @@
+<?php
+
+/**
+ * @file
+ * Provides a WYSIWYG editor like Medium.com.
+ */
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function medium_field_widget_info() {
+  return array(
+    'field_medium_editor' => array(
+      'label' => t('Medium editor'),
+      'field types' => array('text_long')
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function medium_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  $value = isset($items[$delta]['body']) ? $items[$delta]['body'] : '';
+  $widget = $element;
+  $widget['#delta'] = $delta;
+
+  switch ($instance['widget']['type']) {
+    case 'field_medium_editor':
+      $widget += array(
+        '#type' => 'textarea',
+        '#default_value' => $value,
+        '#attributes' => array(
+          'class' => array('editable'),
+          'placeholder' => $widget['#title'],
+        ),
+        '#resizable' => FALSE,
+        '#attached' => array(
+          'js' => array(
+            drupal_get_path('module', 'medium') . '/medium.js',
+          ),
+          'css' => array(
+            drupal_get_path('module', 'medium') . '/medium.css',
+          ),
+        )
+      );
+      $widget['#title'] = '';
+      libraries_load('mediumeditor');
+      break;
+  }
+
+  $element['body'] = $widget;
+  return $element;
+}
+
+/**
+ * Implements hook_libraries_info().
+ */
+function medium_libraries_info() {
+  $libraries['mediumeditor'] = array(
+    'name' => 'Medium Editor',
+    'vendor url' => 'https://github.com/daviferreira/medium-editor',
+    'download url' => 'https://github.com/daviferreira/medium-editor/releases',
+    'version callback' => 'medium_get_package_version',
+    'files' => array(
+      'js' => array(
+        'dist/js/medium-editor.min.js'
+      ),
+      'css' => array(
+        'dist/css/medium-editor.min.css',
+        'dist/css/themes/bootstrap.min.css'
+      ),
+    ),
+  );
+
+  return $libraries;
+}
+
+/**
+ * Version callback for Libraries API.
+ */
+function medium_get_package_version($library) {
+  $file = DRUPAL_ROOT . '/' . $library['library path'] . '/package.json';
+  $package_info = json_decode(file_get_contents($file));
+  return $package_info->version;
+}

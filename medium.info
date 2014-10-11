@@ -1,0 +1,4 @@
+name = Medium Editor
+description = Provides a WYSIWYG editor like Medium.com
+core = 7.x
+dependencies[] = libraries
