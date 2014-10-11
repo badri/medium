@@ -14,14 +14,7 @@
         var editorValue = $(this).find('.medium-editor-container').html();
         $(this).find('.editable-wrapper .editable').val(editorValue);
         $(this).submit();
-//        console.log($(this).find('.editable-wrapper .editable'));
-//        return false;
       });
-//      $(this).parent('form').submit(function() {
-//        var contentObject = editor.serialize();
-//        $(this).find('textarea').val(contentObject['element-0'].value());
-//        alert(contentObject['element-0'].value());
-//      });
     }
   };
 })(jQuery);
