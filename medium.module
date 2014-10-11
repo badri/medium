@@ -21,35 +21,29 @@ function medium_field_widget_info() {
  * Implements hook_field_widget_form().
  */
 function medium_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-  $value = isset($items[$delta]['body']) ? $items[$delta]['body'] : '';
-  $widget = $element;
-  $widget['#delta'] = $delta;
-
   switch ($instance['widget']['type']) {
     case 'field_medium_editor':
-      $widget += array(
-        '#type' => 'textarea',
-        '#default_value' => $value,
-        '#attributes' => array(
-          'class' => array('editable'),
-          'placeholder' => $widget['#title'],
-        ),
-        '#resizable' => FALSE,
-        '#attached' => array(
-          'js' => array(
-            drupal_get_path('module', 'medium') . '/medium.js',
-          ),
-          'css' => array(
-            drupal_get_path('module', 'medium') . '/medium.css',
-          ),
-        )
+      // Start with the normal text_textarea widget.
+      $instance['widget']['type'] = 'text_textarea';
+      $instance['widget']['settings']['rows'] = 1;
+      $element = text_field_widget_form($form, $form_state, $field, $instance, $langcode, $items, $delta, $element);
+      $element['#attributes'] = array(
+        'class' => array('editable'),
+        'placeholder' => $element['#title'],
       );
-      $widget['#title'] = '';
+      $element['#resizable'] = FALSE;
+      $element['#attached'] = array(
+        'js' => array(
+          drupal_get_path('module', 'medium') . '/medium.js',
+        ),
+        'css' => array(
+          drupal_get_path('module', 'medium') . '/medium.css',
+        ),
+      );
       libraries_load('mediumeditor');
       break;
   }
 
-  $element['body'] = $widget;
   return $element;
 }
 
