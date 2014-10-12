@@ -51,6 +51,7 @@ function medium_field_widget_form(&$form, &$form_state, $field, $instance, $lang
  * Implements hook_libraries_info().
  */
 function medium_libraries_info() {
+  // Main medium editor library.
   $libraries['mediumeditor'] = array(
     'name' => 'Medium Editor',
     'vendor url' => 'https://github.com/daviferreira/medium-editor',
@@ -63,6 +64,22 @@ function medium_libraries_info() {
       'css' => array(
         'dist/css/medium-editor.min.css',
         'dist/css/themes/bootstrap.min.css'
+      ),
+    ),
+  );
+
+  // Medium Editor insert library (For media support)
+  $libraries['medium-editor-insert-plugin'] = array(
+    'name' => 'Medium Editor Insert Plugin',
+    'vendor url' => 'https://github.com/orthes/medium-editor-insert-plugin',
+    'download url' => 'https://github.com/orthes/medium-editor-insert-plugin/releases',
+    'version callback' => 'medium_get_package_version',
+    'files' => array(
+      'css' => array(
+        'dist/css/medium-editor-insert-plugin.min.css'
+      ),
+      'js' => array(
+        'dist/js/addons/medium-editor-insert-plugin.min.js'
       ),
     ),
   );
