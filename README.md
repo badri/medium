@@ -6,6 +6,7 @@ The editing interface is similar to that of Medium.com.
 # Requirements
 
 * [Libraries API](https://www.drupal.org/project/libraries)
+* [jQuery Update](https://www.drupal.org/project/jquery_update) -- only if you want the Media module integration. You need to use jQuery 1.9.x
 
 # Installation
 

@@ -11,6 +11,17 @@
         var editor = new MediumEditor('.medium-editor-container', {
           placeholder: $(this).attr('placeholder')
         });
+
+        // If the Media module is enabled, load embed support for the Medium editor.
+        if (Drupal.settings.medium.media_support) {
+          $('.medium-editor-container').mediumInsert({
+            editor: editor,
+            addons: {
+              drupalmedia: {}
+            }
+          });
+        }
+
       });
 
       // When the form is submitted, copy the Medium editor contents

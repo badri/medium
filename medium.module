@@ -33,6 +33,7 @@ function medium_field_widget_form(&$form, &$form_state, $field, $instance, $lang
       );
       $element['#resizable'] = FALSE;
       $element['#attached'] = array(
+        'library' => array(),
         'js' => array(
           drupal_get_path('module', 'medium') . '/medium.js',
         ),
@@ -41,6 +42,33 @@ function medium_field_widget_form(&$form, &$form_state, $field, $instance, $lang
         ),
       );
       libraries_load('mediumeditor');
+
+      // Add media support if necessary.
+      if (module_exists('media')) {
+        libraries_load('medium-editor-insert-plugin');
+        $element['#attached']['js'][] = drupal_get_path('module', 'medium') . '/medium-media.js';
+        $element['#attached']['library'][] = array('media', 'media_browser');
+        $medium_settings = array(
+          'media_support' => TRUE,
+          'types' => array(
+            'image' => 'image',
+          ),
+          'enabledPlugins' => array(
+            'upload' => 'upload',
+            'media_default--media_browser_1' => 'media_default--media_browser_1',
+            'media_default--media_browser_my_files' => 'media_default--media_browser_my_files'
+          ),
+          'schemes' => array('public' => 'public'),
+          'file_directory' => '',
+          'file_extensions' => 'png gif jpg jpeg',
+          'max_filesize' => '',
+          'uri_scheme' => 'public',
+        );
+        drupal_add_js(array('medium' => $medium_settings), 'setting');
+      }
+      else {
+        drupal_add_js(array('medium' => array('media_support' => FALSE)), 'setting');
+      }
       break;
   }
 
@@ -79,7 +107,7 @@ function medium_libraries_info() {
         'dist/css/medium-editor-insert-plugin.min.css'
       ),
       'js' => array(
-        'dist/js/addons/medium-editor-insert-plugin.min.js'
+        'dist/js/addons/medium-editor-insert-plugin.min.js',
       ),
     ),
   );
