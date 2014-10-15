@@ -33,6 +33,8 @@ function medium_field_widget_form(&$form, &$form_state, $field, $instance, $lang
       );
       $element['#resizable'] = FALSE;
       $element['#attached'] = array(
+        // Setting the library key here so that if we DO need to load the Media
+        // browser, it'll be first in the array and will be loaded first.
         'library' => array(),
         'js' => array(
           drupal_get_path('module', 'medium') . '/medium.js',
@@ -43,31 +45,48 @@ function medium_field_widget_form(&$form, &$form_state, $field, $instance, $lang
       );
       libraries_load('mediumeditor');
 
-      // Add media support if necessary.
+      // Add media support if the Media module is enabled.
       if (module_exists('media')) {
         libraries_load('medium-editor-insert-plugin');
         $element['#attached']['js'][] = drupal_get_path('module', 'medium') . '/medium-media.js';
-        $element['#attached']['library'][] = array('media', 'media_browser');
-        $medium_settings = array(
-          'media_support' => TRUE,
-          'types' => array(
-            'image' => 'image',
+
+        // Add the Media browser info.
+        module_load_include('inc', 'media', 'includes/media.browser');
+        media_attach_browser_js($element);
+
+        // Add configuration for the Media browser popup.
+        $element['#attached']['js'][] = array(
+          'data' => array(
+            'medium' => array(
+              'media_support' => TRUE,
+              'types' => array(
+                'image' => 'image',
+              ),
+              'enabledPlugins' => array(
+                'upload' => 'upload',
+                'media_default--media_browser_1' => 'media_default--media_browser_1',
+                'media_default--media_browser_my_files' => 'media_default--media_browser_my_files'
+              ),
+              'schemes' => array('public' => 'public'),
+              'file_directory' => '',
+              'file_extensions' => 'png gif jpg jpeg',
+              'max_filesize' => '',
+              'uri_scheme' => 'public',
+            ),
           ),
-          'enabledPlugins' => array(
-            'upload' => 'upload',
-            'media_default--media_browser_1' => 'media_default--media_browser_1',
-            'media_default--media_browser_my_files' => 'media_default--media_browser_my_files'
-          ),
-          'schemes' => array('public' => 'public'),
-          'file_directory' => '',
-          'file_extensions' => 'png gif jpg jpeg',
-          'max_filesize' => '',
-          'uri_scheme' => 'public',
+          'type' => 'setting',
         );
-        drupal_add_js(array('medium' => $medium_settings), 'setting');
       }
       else {
-        drupal_add_js(array('medium' => array('media_support' => FALSE)), 'setting');
+        // Even if we don't have Media support, the frontend still needs to know.
+        $element['#attached']['js'][] = array(
+          'data' => array(
+            'medium' => array(
+              'media_support' => TRUE,
+            ),
+          ),
+          'type' => 'setting',
+        );
       }
       break;
   }
