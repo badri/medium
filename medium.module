@@ -6,6 +6,68 @@
  */
 
 /**
+ * Implements hook_menu().
+ */
+function medium_menu() {
+  $items = array();
+
+  $items['medium/image/%file'] = array(
+    'title' => 'Medium imagedata endpoint',
+    'page callback' => 'medium_imagedata',
+    'page arguments' => array(2),
+    'access callback' => 'file_entity_access',
+    'access arguments' => array('view', 2),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['admin/config/content/medium'] = array(
+    'title' => 'Medium editor',
+    'description' => 'Configure settings related to the Medium editor.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('medium_admin_form'),
+    'access arguments' => array('administer site configuration'),
+  );
+
+  return $items;
+}
+
+/**
+ * Menu callback/form builder for admin/config/content/medium.
+ */
+function medium_admin_form($form, &$form_state) {
+  $form = array();
+
+// @TODO: Allow users to choose the image style used for media embeds.
+// @TODO: Allow users to choose which media plugins should be exposed.
+
+  $form['whatever'] = array(
+    '#markup' => 'Placeholder'
+  );
+
+  return $form;
+}
+
+/**
+ * Menu callback for medium/image/%file.
+ *
+ * Returns a relative URL to an admin-configured image style for a given file.
+ */
+function medium_imagedata($file) {
+  $image_style = variable_get('medium_insert_image_style', 'thumbnail');
+  $uri = $file->uri;
+  $derivative_uri = image_style_path($image_style, $uri);
+  $new_image_url  = file_create_url($derivative_uri);
+
+  if (file_exists($derivative_uri) || image_style_create_derivative($image_style, $uri, $derivative_uri)) {
+    $url_parts = parse_url($new_image_url);
+    drupal_json_output(array('path' => $url_parts['path']));
+  }
+  else {
+    drupal_not_found();
+  }
+}
+
+/**
  * Implements hook_field_widget_info().
  */
 function medium_field_widget_info() {
