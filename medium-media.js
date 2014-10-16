@@ -34,8 +34,10 @@
 
         // Grab the first of the selected media files.
         var mediaFile = mediaFiles[0];
-
-        alert(mediaFile);
+        $.get('/medium/image/' + mediaFile.fid, function(data) {
+          $.fn.mediumInsert.insert.deselect();
+          $placeholder.append('<img src="' + data.path + '" />');
+        });
       }, Drupal.settings.medium);
 
       return false;
