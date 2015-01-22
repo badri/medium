@@ -6,11 +6,19 @@
  */
 
 /**
+ * Implements hook_wysiwyg_include_directory().
+ */
+function medium_wysiwyg_include_directory($type) {
+  switch ($type) {
+    case 'editors':
+      return $type;
+  }
+}
+
+/**
  * Implements hook_menu().
  */
 function medium_menu() {
-  $items = array();
-
   $items['medium/image/%file'] = array(
     'title' => 'Medium imagedata endpoint',
     'page callback' => 'medium_imagedata',
@@ -37,123 +45,14 @@ function medium_menu() {
 function medium_admin_form($form, &$form_state) {
   $form = array();
 
-// @TODO: Allow users to choose the image style used for media embeds.
-// @TODO: Allow users to choose which media plugins should be exposed.
+  // @TODO: Allow users to choose the image style used for media embeds.
+  // @TODO: Allow users to choose which media plugins should be exposed.
 
   $form['whatever'] = array(
     '#markup' => 'Placeholder'
   );
 
   return $form;
-}
-
-/**
- * Menu callback for medium/image/%file.
- *
- * Returns a relative URL to an admin-configured image style for a given file.
- */
-function medium_imagedata($file) {
-  $image_style = variable_get('medium_insert_image_style', 'thumbnail');
-  $uri = $file->uri;
-  $derivative_uri = image_style_path($image_style, $uri);
-  $new_image_url  = file_create_url($derivative_uri);
-
-  if (file_exists($derivative_uri) || image_style_create_derivative($image_style, $uri, $derivative_uri)) {
-    $url_parts = parse_url($new_image_url);
-    drupal_json_output(array('path' => $url_parts['path']));
-  }
-  else {
-    drupal_not_found();
-  }
-}
-
-/**
- * Implements hook_field_widget_info().
- */
-function medium_field_widget_info() {
-  return array(
-    'field_medium_editor' => array(
-      'label' => t('Medium editor'),
-      'field types' => array('text_long')
-    ),
-  );
-}
-
-/**
- * Implements hook_field_widget_form().
- */
-function medium_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-  switch ($instance['widget']['type']) {
-    case 'field_medium_editor':
-      // Start with the normal text_textarea widget.
-      $instance['widget']['type'] = 'text_textarea';
-      $instance['widget']['settings']['rows'] = 1;
-      $element = text_field_widget_form($form, $form_state, $field, $instance, $langcode, $items, $delta, $element);
-      $element['#attributes'] = array(
-        'class' => array('editable'),
-        'placeholder' => $element['#title'],
-      );
-      $element['#resizable'] = FALSE;
-      $element['#attached'] = array(
-        // Setting the library key here so that if we DO need to load the Media
-        // browser, it'll be first in the array and will be loaded first.
-        'library' => array(),
-        'js' => array(
-          drupal_get_path('module', 'medium') . '/medium.js',
-        ),
-        'css' => array(
-          drupal_get_path('module', 'medium') . '/medium.css',
-        ),
-      );
-      libraries_load('mediumeditor');
-
-      // Add media support if the Media module is enabled.
-      if (module_exists('media')) {
-        libraries_load('medium-editor-insert-plugin');
-        $element['#attached']['js'][] = drupal_get_path('module', 'medium') . '/medium-media.js';
-
-        // Add the Media browser info.
-        module_load_include('inc', 'media', 'includes/media.browser');
-        media_attach_browser_js($element);
-
-        // Add configuration for the Media browser popup.
-        $element['#attached']['js'][] = array(
-          'data' => array(
-            'medium' => array(
-              'media_support' => TRUE,
-              'types' => array(
-                'image' => 'image',
-              ),
-              'enabledPlugins' => array(
-                'upload' => 'upload',
-                'media_default--media_browser_1' => 'media_default--media_browser_1',
-                'media_default--media_browser_my_files' => 'media_default--media_browser_my_files'
-              ),
-              'schemes' => array('public' => 'public'),
-              'file_directory' => '',
-              'file_extensions' => 'png gif jpg jpeg',
-              'max_filesize' => '',
-              'uri_scheme' => 'public',
-            ),
-          ),
-          'type' => 'setting',
-        );
-      }
-      else {
-        // Even if we don't have Media support, the frontend still needs to know.
-        $element['#attached']['js'][] = array(
-          'data' => array(
-            'medium' => array(
-              'media_support' => TRUE,
-            ),
-          ),
-          'type' => 'setting',
-        );
-      }
-      break;
-  }
-
-  return $element;
 }
 
 /**
@@ -197,10 +96,100 @@ function medium_libraries_info() {
 }
 
 /**
- * Version callback for Libraries API.
+ * Detect editor version.
+ *
+ * @editor array
+ *   An array containing editor properties as returned from hook_editor().
+ *
+ * @return string
+ *   The installed editor version.
  */
-function medium_get_package_version($library) {
-  $file = DRUPAL_ROOT . '/' . $library['library path'] . '/package.json';
+function medium_get_package_version($editor) {
+  $file = DRUPAL_ROOT . '/' . $editor['library path'] . '/package.json';
   $package_info = json_decode(file_get_contents($file));
   return $package_info->version;
+}
+
+/**
+ * Menu callback for medium/image/%file.
+ *
+ * Returns a relative URL to an admin-configured image style for a given file.
+ */
+function medium_imagedata($file) {
+  $image_style = variable_get('medium_insert_image_style', 'thumbnail');
+  $uri = $file->uri;
+  $derivative_uri = image_style_path($image_style, $uri);
+  $new_image_url  = file_create_url($derivative_uri);
+
+  if (file_exists($derivative_uri) || image_style_create_derivative($image_style, $uri, $derivative_uri)) {
+    $url_parts = parse_url($new_image_url);
+    drupal_json_output(array('path' => $url_parts['path']));
+  }
+  else {
+    drupal_not_found();
+  }
+}
+
+/**
+ * Implements hook_wysiwyg_editor_settings_alter().
+ */
+function medium_wysiwyg_editor_settings_alter(&$settings, $context) {
+  $using_medium_editor = (bool)($context['editor']['name'] == 'medium');
+  $media_button_enabled = isset($context['profile']->settings['buttons']['default']['media']) &&
+    $context['profile']->settings['buttons']['default']['media'] === 1;
+
+  if ($using_medium_editor && $media_button_enabled) {
+    libraries_load('medium-editor-insert-plugin');
+    drupal_add_js(drupal_get_path('module', 'medium') . '/medium-media.js');
+
+    module_load_include('inc', 'media', 'includes/media.browser');
+
+    $javascript = media_browser_js();
+    $javascript['js'][] = array(
+      'data' => array(
+        'medium' => array(
+          'media_support' => TRUE,
+          'types' => array(
+            'image' => 'image',
+          ),
+          'enabledPlugins' => array(
+            'upload' => 'upload',
+            'media_default--media_browser_1' => 'media_default--media_browser_1',
+            'media_default--media_browser_my_files' => 'media_default--media_browser_my_files'
+          ),
+          'schemes' => array('public' => 'public'),
+          'file_directory' => '',
+          'file_extensions' => 'png gif jpg jpeg',
+          'max_filesize' => '',
+          'uri_scheme' => 'public',
+        ),
+      ),
+      'type' => 'setting',
+    );
+
+  }
+  else {
+    // Even if we don't have Media support, the frontend still needs to know.
+    $javascript = array(
+      'js' => array(
+        'data' => array(
+          'medium' => array(
+            'media_support' => TRUE,
+          ),
+        ),
+        'type' => 'setting',
+      )
+    );
+  }
+
+  foreach ($javascript as $key => $definitions) {
+    foreach ($definitions as $definition) {
+      $function = 'drupal_add_' . $key;
+      // Since the arguments to pass are variable, use call_user_func_array().
+      // This will not handle all potential drupal_add_*() functions directly
+      // but covers the js and library needed here, which are unlikely to be
+      // expanded since this function is only a workaround for a wysiwyg limitation.
+      call_user_func_array($function, $definition);
+    }
+  }
 }

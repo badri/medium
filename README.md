@@ -1,18 +1,19 @@
 # Summary
 
-The Medium module provides a field widget that you can use for Long Text fields.
+The Medium module provides a WYSIWYG editor for WYSIWYG API. Eventually, it may do other things.
 The editing interface is similar to that of Medium.com.
 
 # Requirements
 
 * [Libraries API](https://www.drupal.org/project/libraries)
-* [jQuery Update](https://www.drupal.org/project/jquery_update) -- only if you want the Media module integration. You need to use jQuery 1.9.x
+* [WYSIWYG API](https://www.drupal.org/project/wysiwyg)
+* [jQuery Update](https://www.drupal.org/project/jquery_update) -- only if you want the Media module integration. You need to use jQuery 1.9.x.
 
 # Installation
 
 * Download the module and put it in sites/all/modules (or another valid module path).
-* Download the [medium editor library](https://github.com/daviferreira/medium-editor/archive/1.9.4.zip) and put it in sites/all/libraries/mediumeditor
-* Download the [medium editor insert library](https://github.com/orthes/medium-editor-insert-plugin/archive/0.2.13.zip) and extract it to sites/all/libraries/medium-editor-insert-plugin
+* Download the [medium editor library](https://github.com/daviferreira/medium-editor/archive/2.1.0.zip) and put it in sites/all/libraries/mediumeditor
+* Download the [medium editor insert library](https://github.com/orthes/medium-editor-insert-plugin/archive/0.3.2.zip) and extract it to sites/all/libraries/medium-editor-insert-plugin
 
 ## Drush Make
 
@@ -21,11 +22,11 @@ to download the required Javascript libraries instead of doing it manually.
 
     ; Libraries
     libraries[mediumeditor][download][type] = "file"
-    libraries[mediumeditor][download][url] = "https://github.com/daviferreira/medium-editor/archive/1.9.4.zip"
+    libraries[mediumeditor][download][url] = "https://github.com/daviferreira/medium-editor/archive/2.1.0.zip"
     libraries[mediumeditor][destination] = "libraries"
-
+    
     libraries[medium-editor-insert-plugin][download][type] = "file"
-    libraries[medium-editor-insert-plugin][download][url] = "https://github.com/orthes/medium-editor-insert-plugin/archive/0.2.13.zip"
+    libraries[medium-editor-insert-plugin][download][url] = "https://github.com/orthes/medium-editor-insert-plugin/archive/0.3.2.zip"
     libraries[medium-editor-insert-plugin][destination] = "libraries"
 
 # Contact
