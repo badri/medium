@@ -1,0 +1,47 @@
+medium.admin:
+  path: '/admin/config/content/medium'
+  defaults:
+    _controller: '\Drupal\medium\Controller\MediumController::adminOverview'
+    _title: 'Medium'
+  requirements:
+    _permission: 'administer medium'
+
+medium.editor_add:
+  path: '/admin/config/content/medium/add-editor'
+  defaults:
+    _entity_form: 'medium_editor.add'
+    _title: 'Add editor'
+  requirements:
+    _entity_create_access: 'medium_editor'
+
+entity.medium_editor.edit_form:
+  path: '/admin/config/content/medium/{medium_editor}'
+  defaults:
+    _entity_form: 'medium_editor.edit'
+    _title: 'Edit editor'
+  requirements:
+    _entity_access: 'medium_editor.update'
+
+entity.medium_editor.delete_form:
+  path: '/admin/config/content/medium/{medium_editor}/delete'
+  defaults:
+    _entity_form: 'medium_editor.delete'
+    _title: 'Delete editor'
+  requirements:
+    _entity_access: 'medium_editor.delete'
+
+entity.medium_editor.duplicate_form:
+  path: '/admin/config/content/medium/{medium_editor}/duplicate'
+  defaults:
+    _entity_form: 'medium_editor.duplicate'
+    _title: 'Duplicate editor'
+  requirements:
+    _entity_create_access: 'medium_editor'
+
+medium.settings:
+  path: '/admin/config/content/medium/settings'
+  defaults:
+    _form: '\Drupal\medium\Form\MediumSettingsForm'
+    _title: 'Settings'
+  requirements:
+    _permission: 'administer medium'

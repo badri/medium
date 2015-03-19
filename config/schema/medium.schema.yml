@@ -1,0 +1,60 @@
+# Module settings
+medium.settings:
+  type: mapping
+  label: 'Medium settings'
+  mapping:
+    devmode:
+      type: boolean
+      label: 'Enable development mode'
+
+# Medium Editor entity
+medium.editor.*:
+  type: config_entity
+  label: 'Medium Editor'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Name'
+    description:
+      type: label
+      label: 'Description'
+    delay:
+      type: label
+      label: 'Delay'
+    diffleft:
+      type: label
+      label: 'diffLeft'
+    difftop:
+      type: label
+      label: 'diffTop'
+    settings:
+      type: sequence
+      label: 'Settings'
+      sequence:
+        - type: medium.editor_settings.[%key]
+
+# Editor settings
+medium.editor_settings.toolbar:
+  type: sequence
+  label: 'Toolbar'
+  sequence:
+    - type: string
+      label: 'Toolbar item'
+
+# Editor module plugin
+editor.settings.medium:
+  type: mapping
+  label: 'Medium settings'
+  mapping:
+    default_editor:
+      type: string
+      label: 'Default editor'
+    roles_editors:
+      type: sequence
+      label: 'Roles editors'
+      sequence:
+        - type: string
+          label: 'Role editor'
