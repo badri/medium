@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "5896b652899d28006a72fa04acff0301",
+    "content-hash": "7af3d863c0051b111dd3fd743308f495",
     "packages": [
         {
             "name": "medium-editor",
@@ -14,7 +14,7 @@
                 "url": "https://github.com/yabwe/medium-editor",
                 "reference": "5.23.3"
             },
-            "type": "library"
+            "type": "drupal-library"
         }
     ],
     "packages-dev": [],

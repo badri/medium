@@ -24,4 +24,9 @@
   "require": {
     "medium-editor": "5.23.3"
   }
+    "extra": {
+        "installer-paths": {
+            "web/libraries/{$name}": ["type:drupal-library"]
+        }
+    }
 }
