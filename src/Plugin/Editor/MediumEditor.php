@@ -40,7 +40,7 @@ class MediumEditor extends EditorBase {
   public function settingsForm(array $form, FormStateInterface $form_state, Editor $editor) {
     $settings = $editor->getSettings();
     $medium_editors = array();
-    foreach (entity_load_multiple('medium_editor') as $medium_editor) {
+    foreach (\Drupal::entityTypeManager()->getStorage('medium_editor')->loadMultiple() as $medium_editor) {
       $medium_editors[$medium_editor->id()] = $medium_editor->label();
     }
     // Default editor
@@ -49,7 +49,7 @@ class MediumEditor extends EditorBase {
       '#title' => $this->t('Medium Editor'),
       '#options' => $medium_editors,
       '#default_value' => $settings['default_editor'],
-      '#description' => $this->t('Select the default editor for the authorized roles. Editors can be configured at <a href="!url">Medium admin page</a>.', array('!url' => \Drupal::url('medium.admin'))),
+      '#description' => $this->t('Select the default editor for the authorized roles. Editors can be configured at <a href="@url">Medium admin page</a>.', array('!url' => \Drupal::url('medium.admin'))),
       '#empty_option' => '- ' . $this->t('Select an editor') . ' -',
     );
     // Roles editors
@@ -119,7 +119,7 @@ class MediumEditor extends EditorBase {
       $account = \Drupal::currentUser();
     }
     $id = static::getMediumId($editor, $account);
-    return $id ? entity_load('medium_editor', $id) : FALSE;
+    return $id ? \Drupal::entityTypeManager()->getStorage('medium_editor')->load($id) : FALSE;
   }
 
   /**

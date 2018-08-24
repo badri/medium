@@ -7,9 +7,9 @@
 
 namespace Drupal\medium\Form;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Component\Utility\SafeMarkup;
 
 /**
  * Base form for Medium entities.
@@ -24,7 +24,7 @@ class MediumForm extends EntityForm {
     // Check duplication
     if ($this->getOperation() === 'duplicate') {
       $medium_editor = $medium_editor->createDuplicate();
-      $medium_editor->set('label', $this->t('Duplicate of !label', array('!label' => $medium_editor->label())));
+      $medium_editor->set('label', $this->t('Duplicate of @label', array('@label' => $medium_editor->label())));
       $this->setEntity($medium_editor);
     }
     // Label
@@ -86,7 +86,7 @@ class MediumForm extends EntityForm {
     $form['settings']['toolbar_config']['toolbar'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Active toolbar'),
-      '#default_value' => implode(', ', $medium_editor->getToolbar()),
+      '#default_value' => implode(',', $medium_editor->getToolbar()),
       '#attributes' => array(
         'class' => array('medium-toolbar-input'),
       ),
@@ -97,12 +97,31 @@ class MediumForm extends EntityForm {
     if (!$medium_editor->isNew()) {
       $formats = array();
       foreach (filter_formats(\Drupal::currentUser()) as $format) {
-        $formats[] = '<option value="' . SafeMarkup::checkPlain($format->id()) . '">' . SafeMarkup::checkPlain($format->label()) . '</option>';
+        $formats[Html::escape($format->id())] = Html::escape($format->label());
       }
-      $form['demo']['#markup'] = '<div class="form-item form-type-textarea medium-demo"><label>' . $this->t('Demo') . '</label><textarea class="form-textarea" cols="40" rows="5"></textarea><div class="form-item form-type-select filter-wrapper"><span class="label">' . $this->t('Text format') . '</span> <select class="filter-list form-select">' . implode('', $formats) . '</select></div></div>';
-      $form['demo']['#weight'] = 1000;
-      $form['demo']['#attached']['library'] = $medium_editor->getLibraries();
-      $form['demo']['#attached']['drupalSettings']['medium']['demoSettings'] = $medium_editor->getJSSettings();
+      $form['demo'] = [
+        '#type' => 'textarea',
+        '#title' => $this->t('Demo'),
+        '#rows' => 5,
+        '#cols' => 40,
+        '#attributes' => [
+          'class' => 'medium-demo',
+        ],
+        '#weight' => 1000,
+        '#attached' => [
+          'library' => $medium_editor->getLibraries(),
+          'drupalSettings' => [
+            'medium' => [
+              'demoSettings' => $medium_editor->getJSSettings(),
+            ],
+          ],
+        ],
+      ];
+      $form['demo']['#filter'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Text format'),
+        '#options' => $formats,
+      ];
     }
     // Add admin library
     $form['#attached']['library'][] = 'medium/drupal.medium.admin';
@@ -115,19 +134,19 @@ class MediumForm extends EntityForm {
    * {@inheritdoc}
    */
   public function validate(array $form, FormStateInterface $form_state) {
-    parent::validate($form, $form_state);
-    $toolbar = &$form_state->getValue(array('settings', 'toolbar'));
-    // Convert toolbar to array.
-    if (is_string($toolbar)) {
-      $toolbar = array_values(array_filter(array_map('trim', explode(',', $toolbar))));
-    }
     \Drupal::service('plugin.manager.medium.plugin')->validateEditorForm($form, $form_state, $this->getEntity());
+    parent::validate($form, $form_state);
   }
 
   /**
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    $toolbar = &$form_state->getValue(array('settings', 'toolbar'));
+    // Convert toolbar to array.
+    if (is_string($toolbar)) {
+      $toolbar = array_values(array_filter(array_map('trim', explode(',', $toolbar))));
+    }
     $medium_editor = $this->getEntity();
     $status = $medium_editor->save();
     if ($status == SAVED_NEW) {

@@ -1,19 +1,27 @@
 {
-    "repositories": [
-        {
-            "type": "package",
-            "package": {
-                "name": "medium-editor",
-                "version": "3.0.9",
-                "source": {
-                    "url": "https://github.com/daviferreira/medium-editor",
-                    "type": "git",
-                    "reference": "3.0.9"
-                }
-            }
+  "name": "drupal/medium",
+  "description": "The Medium module provides a field widget that you can use for Long Text fields.",
+  "type": "drupal-module",
+  "homepage": "http://drupal.org/project/medium",
+  "support": {
+    "issues": "https://drupal.org/project/issues/medium"
+  },
+  "repositories": [
+    {
+      "type": "package",
+      "package": {
+        "name": "medium-editor",
+        "type": "drupal-library",
+        "version": "5.23.3",
+        "source": {
+          "url": "https://github.com/yabwe/medium-editor",
+          "type": "git",
+          "reference": "5.23.3"
         }
-    ],
-    "require": {
-        "medium-editor": "3.0.9"
+      }
     }
+  ],
+  "require": {
+    "medium-editor": "5.23.3"
+  }
 }

@@ -7,9 +7,9 @@
 
 namespace Drupal\medium;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Component\Utility\SafeMarkup;
 
 /**
  * Defines a class to build a list of Medium Editor entities.
@@ -34,9 +34,9 @@ class MediumListBuilder extends ConfigEntityListBuilder {
    */
   public function buildRow(EntityInterface $medium_editor) {
     $row['label'] = $medium_editor->label();
-    $row['description'] = SafeMarkup::checkPlain($medium_editor->get('description'));
-    $row['toolbar'] = SafeMarkup::checkPlain(implode(', ', $medium_editor->getToolbar()));
-    $row['delay'] = SafeMarkup::checkPlain($medium_editor->get('delay'));
+    $row['description'] = Html::escape($medium_editor->get('description'));
+    $row['toolbar'] = Html::escape(implode(', ', $medium_editor->getToolbar()));
+    $row['delay'] = Html::escape($medium_editor->get('delay'));
     return $row + parent::buildRow($medium_editor);
   }
 

@@ -1,18 +1,18 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f17958ebd2bda23da43fdd7c60b65627",
+    "content-hash": "5896b652899d28006a72fa04acff0301",
     "packages": [
         {
             "name": "medium-editor",
-            "version": "3.0.9",
+            "version": "5.23.3",
             "source": {
                 "type": "git",
-                "url": "https://github.com/daviferreira/medium-editor",
-                "reference": "3.0.9"
+                "url": "https://github.com/yabwe/medium-editor",
+                "reference": "5.23.3"
             },
             "type": "library"
         }

@@ -32,7 +32,7 @@ if (Drupal.editors) Drupal.editors.medium = {
         var mediumText = $(this).find('.medium-editable').html();
         var textArea = $(this).find('textarea');
         // We need to set the value attribute to changed.
-        textArea.attr( 'data-editor-value-is-changed', 'true' );
+        textArea.attr('data-editor-value-is-changed', 'true');
         textArea.val(mediumText);
       });
 
@@ -43,6 +43,31 @@ if (Drupal.editors) Drupal.editors.medium = {
       buttons: toolbar,
       diffLeft: 0,
       diffTop: -10
+    }).Extension({
+      name: 'keyboard-commands',
+      commands: [
+        {
+          command: 'bold',
+          key: 'B',
+          meta: true,
+          shift: false,
+          alt: false
+        },
+        {
+          command: 'italic',
+          key: 'I',
+          meta: true,
+          shift: false,
+          alt: false
+        },
+        {
+          command: 'underline',
+          key: 'U',
+          meta: true,
+          shift: false,
+          alt: false
+        }
+      ]
     });
     }
   },
